@@ -12,9 +12,10 @@ COPY ./app/server ./server
 COPY ./app/utils ./utils
 COPY ./main.go ./
 COPY ./.env ./
+RUN source ./.env
 
 # Build the application
-RUN go build -o server .
+RUN go build -o auth_server .
 
 EXPOSE 3456
-CMD ["./server"]
+CMD ["./auth_server"]

@@ -6,11 +6,13 @@ import (
 )
 
 type Config struct {
-	// Configuration variables
-	DatabaseHostname string
-	DatabaseUsername string
-	DatabasePassword string
-	AppSecretKey     string
+	DatabaseHostname  string
+	DatabaseName      string
+	DatabasePort      string
+	DatabaseTableName string
+	DatabaseUsername  string
+	DatabasePassword  string
+	AppSecretKey      string
 }
 
 func getEnv(key, defaultValue string) string {
@@ -22,23 +24,27 @@ func getEnv(key, defaultValue string) string {
 }
 
 func LoadConfig() (*Config, error) {
-	// Load and return the configuration
 	config := &Config{
-		DatabaseHostname: getEnv("DATABASE_HOSTNAME", "localhost"),
-		DatabaseUsername: getEnv("DATABASE_USERNAME", "user"),
-		DatabasePassword: getEnv("DATABASE_PASSWORD", "password"),
-		AppSecretKey:     getEnv("APP_SECRET_KEY", "your-secret-key"),
+		DatabaseHostname:  getEnv("DATABASE_HOSTNAME", "undefined"),
+		DatabaseName:      getEnv("DATABASE_NAME", "undefined"),
+		DatabasePort:      getEnv("DATABASE_PORT", "undefined"),
+		DatabaseTableName: getEnv("DATABASE_TABLENAME", "undefined"),
+		DatabaseUsername:  getEnv("DATABASE_USERNAME", "undefined"),
+		DatabasePassword:  getEnv("DATABASE_PASSWORD", "undefined"),
+		AppSecretKey:      getEnv("APP_SECRET_KEY", "undefined"),
 	}
 
 	return config, nil
 }
 
 func (c *Config) GetDatabaseURL() string {
-	// Get the database URL
-	return fmt.Sprintf("%s:%s@tcp(%s)/database", c.DatabaseUsername, c.DatabasePassword, c.DatabaseHostname)
+	return fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", c.DatabaseUsername, c.DatabasePassword, c.DatabaseHostname, c.DatabasePort, c.DatabaseName)
+}
+
+func (c *Config) GetDatabaaseTableName() string {
+	return c.DatabaseTableName
 }
 
 func (c *Config) GetAppSecretKey() string {
-	// Get the app secret key
 	return c.AppSecretKey
 }

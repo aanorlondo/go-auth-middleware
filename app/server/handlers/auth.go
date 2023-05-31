@@ -17,6 +17,7 @@ type Credentials struct {
 	Password string `json:"password"`
 }
 
+// LOGIN HANDLER
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	logger.Info("Handling login request")
 	if r.Method != http.MethodPost {
@@ -24,7 +25,6 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
-
 	// Parse the request body to get the credentials
 	logger.Info("Parsing request body...")
 	var credentials Credentials
@@ -34,7 +34,6 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid request", http.StatusBadRequest)
 		return
 	}
-
 	// Retrieve the user from the database by username
 	logger.Info("Retrieving user from database...")
 	user, err := models.GetUserByUsername(credentials.Username)
@@ -43,18 +42,15 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Error retrieving user", http.StatusInternalServerError)
 		return
 	}
-
 	// Check if the user exists and the password is correct
 	if user == nil || !checkPasswordHash(credentials.Password, user.Password) {
 		logger.Info("Invalid username or password")
 		http.Error(w, "Invalid username or password", http.StatusUnauthorized)
 		return
 	}
-
 	// Generate a JWT token with user data
 	logger.Info("Generating JWT token...")
 	tokenData := map[string]interface{}{
-		"user_id":  user.ID,
 		"username": user.Username,
 		// Add other user data or claims as required
 	}
@@ -64,12 +60,12 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Error generating JWT token", http.StatusInternalServerError)
 		return
 	}
-
 	// Return the token as a response
 	response := map[string]string{"token": token}
 	jsonResponse(w, response, http.StatusOK)
 }
 
+// SIGNUP HANDER
 func SignupHandler(w http.ResponseWriter, r *http.Request) {
 	logger.Info("Handling signup request")
 	if r.Method != http.MethodPost {
@@ -77,7 +73,6 @@ func SignupHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
-
 	// Parse the request body to get the credentials
 	logger.Info("Parsing request body...")
 	var credentials Credentials
@@ -87,7 +82,6 @@ func SignupHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid request", http.StatusBadRequest)
 		return
 	}
-
 	// Check if the username already exists in the database
 	logger.Info("Checking username availability...")
 	existingUser, err := models.GetUserByUsername(credentials.Username)
@@ -101,7 +95,6 @@ func SignupHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Username already exists", http.StatusConflict)
 		return
 	}
-
 	// Hash the password
 	logger.Info("Hashing password...")
 	hashedPassword, err := hashPassword(credentials.Password)
@@ -110,14 +103,12 @@ func SignupHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Error hashing password", http.StatusInternalServerError)
 		return
 	}
-
 	// Create a new user
 	user := &models.User{
 		Username: credentials.Username,
 		Password: hashedPassword,
 		// Add other user data as required
 	}
-
 	// Save the user to the database
 	logger.Info("Saving user to the database...")
 	err = user.Save()
@@ -126,11 +117,9 @@ func SignupHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Error creating user", http.StatusInternalServerError)
 		return
 	}
-
 	// Generate a JWT token with user data
 	logger.Info("Generating JWT token...")
 	tokenData := map[string]interface{}{
-		"user_id":  user.ID,
 		"username": user.Username,
 		// Add other user data or claims as required
 	}
@@ -140,15 +129,14 @@ func SignupHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Error generating JWT token", http.StatusInternalServerError)
 		return
 	}
-
 	// Return the token as a response
 	response := map[string]string{"token": token}
 	jsonResponse(w, response, http.StatusCreated)
 }
 
+// PASSWORD HASH
 func hashPassword(password string) (string, error) {
 	logger.Info("Hashing password")
-
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
 		logger.Error("Error hashing password: ", err)
@@ -159,14 +147,13 @@ func hashPassword(password string) (string, error) {
 
 func checkPasswordHash(password, hash string) bool {
 	logger.Info("Checking password hash")
-
 	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
 	return err == nil
 }
 
+// JSON RESPONSE
 func jsonResponse(w http.ResponseWriter, data interface{}, statusCode int) {
 	logger.Info("Creating JSON response")
-
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
 	err := json.NewEncoder(w).Encode(data)

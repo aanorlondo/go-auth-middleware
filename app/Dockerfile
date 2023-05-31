@@ -11,10 +11,6 @@ COPY ./models ./models
 COPY ./server ./server
 COPY ./utils ./utils
 COPY ./main.go ./
-COPY ./.env ./
-
-# Read env vars
-RUN source ./.env
 
 # Build the server application
 RUN go build -o auth_server .

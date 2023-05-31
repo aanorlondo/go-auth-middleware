@@ -12,14 +12,13 @@ import (
 
 // ORM
 type User struct {
-	ID       int
 	Username string
 	Password string
-	// Add other fields as required
 }
 
 var logger = utils.GetLogger()
 var databaseUrl = ""
+var databaseTableName = ""
 
 // INIT
 func init() {
@@ -28,15 +27,13 @@ func init() {
 		panic("Failed to load config: " + err.Error())
 	}
 	databaseUrl = cfg.GetDatabaseURL()
+	databaseTableName = cfg.GetDatabaaseTableName()
 }
 
 // CRUD
-
 // // - CREATE (INSERT)
 func (u *User) Save() error {
 	logger.Info("Saving new user ", u, " to database...")
-
-	// Open a connection to the MySQL database
 	logger.Info("Connecting to database...")
 	db, err := sql.Open("mysql", databaseUrl)
 	if err != nil {
@@ -44,15 +41,12 @@ func (u *User) Save() error {
 		return err
 	}
 	defer db.Close()
-
-	// Execute the SQL query to save the user
 	logger.Info("Executing query...")
-	_, err = db.Exec("INSERT INTO users (username, password) VALUES (?, ?)", u.Username, u.Password)
+	_, err = db.Exec("INSERT INTO "+databaseTableName+" (username, password) VALUES (?, ?)", u.Username, u.Password)
 	if err != nil {
 		logger.Error("ERROR when inserting new user to database: ", err)
 		return err
 	}
-
 	logger.Info("User successfully inserted.")
 	return nil
 }
@@ -60,8 +54,6 @@ func (u *User) Save() error {
 // // - READ (SELECT)
 func GetUserByUsername(username string) (*User, error) {
 	logger.Info("Getting user by username: ", username)
-
-	// Open a connection to the MySQL database
 	logger.Info("Connecting to the database...")
 	db, err := sql.Open("mysql", databaseUrl)
 	if err != nil {
@@ -69,24 +61,18 @@ func GetUserByUsername(username string) (*User, error) {
 		return nil, err
 	}
 	defer db.Close()
-
-	// Execute the SQL query to retrieve the user by username
 	logger.Info("Executing query...")
-	row := db.QueryRow("SELECT id, username, password FROM users WHERE username = ?", username)
-
-	// Scan the row data into a User struct
+	row := db.QueryRow("SELECT username, password FROM "+databaseTableName+" WHERE username = ?", username)
 	user := &User{}
-	err = row.Scan(&user.ID, &user.Username, &user.Password)
+	err = row.Scan(&user.Username, &user.Password)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			// User not found
 			logger.Info("User not found with username: ", username)
 			return nil, nil
 		}
 		logger.Error("ERROR when retrieving user: ", err)
 		return nil, err
 	}
-
 	logger.Info("User retrieved successfully: ", user.Username)
 	return user, nil
 }
@@ -94,8 +80,6 @@ func GetUserByUsername(username string) (*User, error) {
 // // - UPDATE
 func (u *User) Update() error {
 	logger.Info("Updating user: ", u.Username)
-
-	// Open a connection to the MySQL database
 	logger.Info("Connecting to the database...")
 	db, err := sql.Open("mysql", databaseUrl)
 	if err != nil {
@@ -103,15 +87,12 @@ func (u *User) Update() error {
 		return err
 	}
 	defer db.Close()
-
-	// Execute the SQL query to update the user
 	logger.Info("Executing query...")
-	_, err = db.Exec("UPDATE users SET username = ?, password = ? WHERE id = ?", u.Username, u.Password, u.ID)
+	_, err = db.Exec("UPDATE "+databaseTableName+" SET password = ? WHERE username = ?", u.Username, u.Password)
 	if err != nil {
 		logger.Error("ERROR when updating user: ", err)
 		return err
 	}
-
 	logger.Info("User updated successfully: ", u.Username)
 	return nil
 }

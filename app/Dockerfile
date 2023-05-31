@@ -5,16 +5,18 @@ WORKDIR /app
 COPY go.mod go.sum ./
 RUN go mod download
 
-# Copy server files
-COPY ./app/config ./config
-COPY ./app/models ./models
-COPY ./app/server ./server
-COPY ./app/utils ./utils
+# Copy Gp server files
+COPY ./config ./config
+COPY ./models ./models
+COPY ./server ./server
+COPY ./utils ./utils
 COPY ./main.go ./
 COPY ./.env ./
+
+# Read env vars
 RUN source ./.env
 
-# Build the application
+# Build the server application
 RUN go build -o auth_server .
 
 EXPOSE 3456

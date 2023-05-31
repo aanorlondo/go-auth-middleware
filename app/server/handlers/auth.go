@@ -19,6 +19,11 @@ type Credentials struct {
 
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	logger.Info("Handling login request")
+	if r.Method != http.MethodPost {
+		logger.Error("ERROR: ", r.Method, " method not supported. Expected: ", http.MethodPost)
+		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+		return
+	}
 
 	// Parse the request body to get the credentials
 	logger.Info("Parsing request body...")
@@ -67,6 +72,11 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 
 func SignupHandler(w http.ResponseWriter, r *http.Request) {
 	logger.Info("Handling signup request")
+	if r.Method != http.MethodPost {
+		logger.Error("ERROR: ", r.Method, " method not supported. Expected: ", http.MethodPost)
+		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+		return
+	}
 
 	// Parse the request body to get the credentials
 	logger.Info("Parsing request body...")

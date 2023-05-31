@@ -10,6 +10,11 @@ import (
 
 func GetUserHandler(w http.ResponseWriter, r *http.Request) {
 	logger.Info("Handling get user request")
+	if r.Method != http.MethodGet {
+		logger.Error("ERROR: ", r.Method, " method not supported. Expected: ", http.MethodGet)
+		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+		return
+	}
 
 	// Extract the token from the request headers
 	logger.Info("Extracting token from request headers...")
@@ -63,6 +68,11 @@ func GetUserHandler(w http.ResponseWriter, r *http.Request) {
 
 func UpdateUserHandler(w http.ResponseWriter, r *http.Request) {
 	logger.Info("Handling update user request")
+	if r.Method != http.MethodPut {
+		logger.Error("ERROR: ", r.Method, " method not supported. Expected: ", http.MethodPut)
+		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+		return
+	}
 
 	// Extract the token from the request headers
 	logger.Info("Extracting token from request headers...")

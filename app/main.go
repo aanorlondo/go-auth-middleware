@@ -17,8 +17,8 @@ func main() {
 		return
 	}
 	s := server.NewServer()
-	logger.Info("Server initialized.")
-	logger.Info("Serving configuration: ", conf)
-	logger.Info("Server listening on port: 3456")
+	log.Print("Server initialized.")
+	log.Print("Serving configuration: ", conf)
+	log.Print("Server listening on port: 3456...")
 	log.Fatal(http.ListenAndServe(":3456", s.Router))
 }

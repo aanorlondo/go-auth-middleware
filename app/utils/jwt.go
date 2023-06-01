@@ -67,6 +67,7 @@ func VerifyToken(tokenString string) (*jwt.Token, error) {
 	logger.Info("Verifying JWT token")
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			logger.Error(("ERROR when verifying JWT toke: invalid signing method"))
 			return nil, errors.New("invalid signing method")
 		}
 		return secretKey, nil

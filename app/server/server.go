@@ -15,11 +15,12 @@ func NewServer() *Server {
 		Router: http.NewServeMux(),
 	}
 
-	// Register your routes here
-	s.Router.HandleFunc("/login", handlers.LoginHandler)
-	s.Router.HandleFunc("/signup", handlers.SignupHandler)
-	s.Router.Handle("/user", middleware.JWTMiddleware(http.HandlerFunc(handlers.GetUserHandler)))
-	s.Router.Handle("/user/update", middleware.JWTMiddleware(http.HandlerFunc(handlers.UpdateUserHandler)))
+	// TODO: add a GET "/" route to display a front-end (help) page to list the known routes and expected payloads/headers
+
+	s.Router.HandleFunc("/login", handlers.LoginHandler)                                                    // POST
+	s.Router.HandleFunc("/signup", handlers.SignupHandler)                                                  // POST
+	s.Router.Handle("/user", middleware.JWTMiddleware(http.HandlerFunc(handlers.GetUserHandler)))           // GET
+	s.Router.Handle("/user/update", middleware.JWTMiddleware(http.HandlerFunc(handlers.UpdateUserHandler))) // PUT
 
 	return s
 }

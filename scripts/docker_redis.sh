@@ -10,9 +10,6 @@ docker rmi redis/redis-stack:latest
 # dynamically configure redis to be in the same network as the host
 host_ip=$(ipconfig getifaddr en0)
 
-# build the proxy
-docker build -t negan/redis-rbac:local ../db/redis
-
 # run redis
 VOLUME_ABSPATH=$(readlink -f "../db/redis/local-persistence")
 CONFIG_ABSPATH=$(readlink -f "../db/redis/redis.conf")

@@ -4,6 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
+	"os"
+	"strings"
 
 	"app/models"
 	"app/utils"
@@ -16,9 +18,17 @@ type PromotionRequest struct {
 }
 
 func PromoteUserHandler(w http.ResponseWriter, r *http.Request, redisClient *redis.Client) {
+	logger.Info("Handling user promotion request")
 	if r.Method != http.MethodPost {
 		logger.Error("Method Not Allowed")
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	// Check if the request contains a valid token
+	validToken := checkAuthToken(r)
+	if !validToken {
+		logger.Error("Invalid or missing token")
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}
 	var request PromotionRequest
@@ -52,9 +62,17 @@ func PromoteUserHandler(w http.ResponseWriter, r *http.Request, redisClient *red
 }
 
 func DemoteUserHandler(w http.ResponseWriter, r *http.Request, redisClient *redis.Client) {
+	logger.Info("Handling user demotion request")
 	if r.Method != http.MethodPost {
 		logger.Error("Method Not Allowed")
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	// Check if the request contains a valid token
+	validToken := checkAuthToken(r)
+	if !validToken {
+		logger.Error("Invalid or missing token")
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}
 	var request PromotionRequest
@@ -133,4 +151,18 @@ func CheckUserHandler(w http.ResponseWriter, r *http.Request, redisClient *redis
 		return
 	}
 	jsonResponse(w, map[string]string{"message": "User has readWrite privileges"}, http.StatusOK)
+}
+
+func checkAuthToken(r *http.Request) bool {
+	authHeader := r.Header.Get("Authorization")
+	if authHeader == "" {
+		return false
+	}
+	splitToken := strings.Split(authHeader, "Bearer ")
+	if len(splitToken) != 2 {
+		return false
+	}
+	token := splitToken[1]
+	secret := os.Getenv("API_ADMIN_TOKEN")
+	return token == secret
 }

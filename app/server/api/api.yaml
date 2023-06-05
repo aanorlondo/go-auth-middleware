@@ -12,6 +12,10 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
+    APIKeyAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: API_KEY
 
 paths:
   # LOGIN
@@ -103,7 +107,6 @@ paths:
           description: Successful password update
 
   # CHECK USER PRIVILEGES
-
   /user/check:
     get:
       summary: Check user privileges
@@ -112,6 +115,58 @@ paths:
       responses:
         "200":
           description: Successful privilege check
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+  # PROMOTE USER PRIVILEGES
+  /user/promote:
+    post:
+      summary: Promote user privileges to 'readWrite'
+      security:
+        - APIKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+      responses:
+        "200":
+          description: Successful user promotion
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+  # DEMOTE USER PRIVILEGES
+  /user/demote:
+    post:
+      summary: Demote user privileges to 'readOnly'
+      security:
+        - APIKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+      responses:
+        "200":
+          description: Successful user demotion
           content:
             application/json:
               schema:

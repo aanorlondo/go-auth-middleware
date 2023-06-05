@@ -29,6 +29,7 @@ docker run \
     -e REDIS_HOSTNAME=${REDIS_HOSTNAME}\
     -e REDIS_PORT=${REDIS_PORT}\
     -e REDIS_PASSWORD=${REDIS_PASSWORD}\
+    -e API_ADMIN_TOKEN=${API_ADMIN_TOKEN}\
     -e APP_SECRET_KEY=${APP_SECRET_KEY}\
     --add-host="host:${host_ip}" \
     --name GO-AUTH-LOCAL \

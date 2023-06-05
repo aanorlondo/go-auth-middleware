@@ -9,6 +9,7 @@ export DATABASE_PORT=3306
 export REDIS_HOSTNAME=$(hostname)
 export REDIS_PORT=6379
 export APP_SECRET_KEY=azertyuiop12345
+export API_ADMIN_TOKEN=admin
 
 # INTEGRATION
 # // app and mysql

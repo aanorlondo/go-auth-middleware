@@ -26,3 +26,4 @@ go.work
 # init scripts
 init.sql
 init.sh
+redis.conf

@@ -12,6 +12,9 @@ type Config struct {
 	DatabaseTableName string
 	DatabaseUsername  string
 	DatabasePassword  string
+	RedisHostname     string
+	RedisPort         string
+	RedisPassword     string
 	AppSecretKey      string
 }
 
@@ -31,6 +34,9 @@ func LoadConfig() (*Config, error) {
 		DatabaseTableName: getEnv("DATABASE_TABLENAME", "undefined"),
 		DatabaseUsername:  getEnv("DATABASE_USERNAME", "undefined"),
 		DatabasePassword:  getEnv("DATABASE_PASSWORD", "undefined"),
+		RedisHostname:     getEnv("REDIS_HOSTNAME", "undefined"),
+		RedisPort:         getEnv("REDIS_PORT", "undefined"),
+		RedisPassword:     getEnv("REDIS_PASSWORD", "undefined"),
 		AppSecretKey:      getEnv("APP_SECRET_KEY", "undefined"),
 	}
 
@@ -41,10 +47,18 @@ func (c *Config) GetDatabaseURL() string {
 	return fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", c.DatabaseUsername, c.DatabasePassword, c.DatabaseHostname, c.DatabasePort, c.DatabaseName)
 }
 
-func (c *Config) GetDatabaaseTableName() string {
+func (c *Config) GetDatabaseTableName() string {
 	return c.DatabaseTableName
 }
 
 func (c *Config) GetAppSecretKey() string {
 	return c.AppSecretKey
+}
+
+func (c *Config) GetRedisURL() string {
+	return fmt.Sprintf("%s:%s", c.RedisHostname, c.RedisPort)
+}
+
+func (c *Config) GetRedisPassword() string {
+	return c.RedisPassword
 }

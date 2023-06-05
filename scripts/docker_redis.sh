@@ -13,9 +13,6 @@ host_ip=$(ipconfig getifaddr en0)
 # build the proxy
 docker build -t negan/redis-rbac:local ../db/redis
 
-# push the image to remote
-docker push redis/redis-stack:latest
-
 # run redis
 VOLUME_ABSPATH=$(readlink -f "../db/redis/local-persistence")
 CONFIG_ABSPATH=$(readlink -f "../db/redis/redis.conf")

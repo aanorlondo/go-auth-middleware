@@ -111,7 +111,12 @@ func UpdateUserHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// Update the user fields
-	user.Password = updatedUser.Password
+	user.Password, err = hashPassword(updatedUser.Password)
+	if err != nil {
+		logger.Error("Error hashing new password: ", err)
+		http.Error(w, "Error hasing new password", http.StatusInternalServerError)
+		return
+	}
 	// Update or save the user in the database
 	if user.Username != "" {
 		logger.Info("User already exists. Updating fields...")

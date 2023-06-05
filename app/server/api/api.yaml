@@ -1,8 +1,24 @@
-openapi: 3.0.0
+openapi: 3.0.3
 info:
   title: Go Auth Server
   version: 1.0.0
+  description: Centralized Authentication (Golang) & Authorization (JWT+Redis) LAN server
+servers:
+  - url: "https://macbookpro-de-khaled.lan/go-auth"
+
+components:
+  securitySchemes:
+    JWTAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    APIKeyAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: API_KEY
+
 paths:
+  # LOGIN
   /login:
     post:
       summary: User login
@@ -27,6 +43,8 @@ paths:
                 properties:
                   token:
                     type: string
+
+  # SIGN UP
   /signup:
     post:
       summary: User signup
@@ -51,6 +69,8 @@ paths:
                 properties:
                   token:
                     type: string
+
+  # GET USER
   /user:
     get:
       summary: Get user information
@@ -67,6 +87,7 @@ paths:
                   username:
                     type: string
 
+  # UPDATE USER
   /user/update:
     put:
       summary: Update user password
@@ -85,16 +106,71 @@ paths:
         "200":
           description: Successful password update
 
-  /:
+  # CHECK USER PRIVILEGES
+  /user/check:
     get:
-      summary: API Specification
+      summary: Check user privileges
+      security:
+        - JWTAuth: []
       responses:
         "200":
-          description: Successful retrieval of API specification
+          description: Successful privilege check
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  specification:
+                  message:
+                    type: string
+
+  # PROMOTE USER PRIVILEGES
+  /user/promote:
+    post:
+      summary: Promote user privileges to 'readWrite'
+      security:
+        - APIKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+      responses:
+        "200":
+          description: Successful user promotion
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+  # DEMOTE USER PRIVILEGES
+  /user/demote:
+    post:
+      summary: Demote user privileges to 'readOnly'
+      security:
+        - APIKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+      responses:
+        "200":
+          description: Successful user demotion
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
                     type: string

@@ -1,9 +1,11 @@
 package handlers
 
 import (
+	"context"
 	"encoding/json"
 	"net/http"
 
+	"github.com/redis/go-redis/v9"
 	"golang.org/x/crypto/bcrypt"
 
 	"app/models"
@@ -66,7 +68,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // SIGNUP HANDER
-func SignupHandler(w http.ResponseWriter, r *http.Request) {
+func SignupHandler(w http.ResponseWriter, r *http.Request, redisClient *redis.Client) {
 	logger.Info("Handling signup request")
 	if r.Method != http.MethodPost {
 		logger.Error("ERROR: ", r.Method, " method not supported. Expected: ", http.MethodPost)
@@ -96,7 +98,6 @@ func SignupHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// Hash the password
-	logger.Info("Hashing password...")
 	hashedPassword, err := hashPassword(credentials.Password)
 	if err != nil {
 		logger.Error("Error hashing password: ", err)
@@ -107,21 +108,25 @@ func SignupHandler(w http.ResponseWriter, r *http.Request) {
 	user := &models.User{
 		Username: credentials.Username,
 		Password: hashedPassword,
-		// Add other user data as required
 	}
 	// Save the user to the database
-	logger.Info("Saving user to the database...")
 	err = user.Save()
 	if err != nil {
 		logger.Error("Error creating user: ", err)
 		http.Error(w, "Error creating user", http.StatusInternalServerError)
 		return
 	}
+	// Set the user's role in Redis
+	logger.Info("Writing user role in Redis...")
+	err = redisClient.Set(context.Background(), "user:role:"+user.Username, "readOnly", 0).Err()
+	if err != nil {
+		logger.Error("Error setting user role in Redis: ", err)
+		http.Error(w, "Error setting user role in Redis", http.StatusInternalServerError)
+		return
+	}
 	// Generate a JWT token with user data
-	logger.Info("Generating JWT token...")
 	tokenData := map[string]interface{}{
 		"username": user.Username,
-		// Add other user data or claims as required
 	}
 	token, err := utils.GenerateJWTToken(tokenData)
 	if err != nil {
@@ -136,7 +141,7 @@ func SignupHandler(w http.ResponseWriter, r *http.Request) {
 
 // PASSWORD HASH
 func hashPassword(password string) (string, error) {
-	logger.Info("Hashing password")
+	logger.Info("Hashing password...")
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
 		logger.Error("Error hashing password: ", err)
@@ -146,14 +151,14 @@ func hashPassword(password string) (string, error) {
 }
 
 func checkPasswordHash(password, hash string) bool {
-	logger.Info("Checking password hash")
+	logger.Info("Checking password hash...")
 	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
 	return err == nil
 }
 
 // JSON RESPONSE
 func jsonResponse(w http.ResponseWriter, data interface{}, statusCode int) {
-	logger.Info("Creating JSON response")
+	logger.Info("Creating JSON response...")
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
 	err := json.NewEncoder(w).Encode(data)

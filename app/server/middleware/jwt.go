@@ -12,7 +12,7 @@ func JWTMiddleware(next http.Handler) http.Handler {
 		logger.Info("JWTMiddleware: Handling request")
 
 		// Extract the JWT token from the request headers or cookies
-		logger.Info("Extracting JWT token from request...")
+		logger.Info("Middleware: Extracting JWT token from request...")
 		tokenString := utils.ExtractTokenFromRequest(r)
 		if tokenString == "" {
 			logger.Error("Missing JWT token")
@@ -21,7 +21,7 @@ func JWTMiddleware(next http.Handler) http.Handler {
 		}
 
 		// Verify and validate the JWT token
-		logger.Info("Verifying JWT token...")
+		logger.Info("Middleware: Verifying JWT token...")
 		token, err := utils.VerifyToken(tokenString)
 		if err != nil || !token.Valid {
 			logger.Error("Invalid JWT token: ", err)

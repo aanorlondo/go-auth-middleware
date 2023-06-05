@@ -27,13 +27,13 @@ func init() {
 		panic("Failed to load config: " + err.Error())
 	}
 	databaseUrl = cfg.GetDatabaseURL()
-	databaseTableName = cfg.GetDatabaaseTableName()
+	databaseTableName = cfg.GetDatabaseTableName()
 }
 
 // CRUD
 // // - CREATE (INSERT)
 func (u *User) Save() error {
-	logger.Info("Saving new user ", u, " to database...")
+	logger.Info("Saving new user ", u.Username, " to database...")
 	logger.Info("Connecting to database...")
 	db, err := sql.Open("mysql", databaseUrl)
 	if err != nil {

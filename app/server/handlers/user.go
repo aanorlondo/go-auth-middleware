@@ -17,7 +17,6 @@ func GetUserHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// Extract the token from the request headers
-	logger.Info("Extracting token from request headers...")
 	tokenString := utils.ExtractTokenFromRequest(r)
 	if tokenString == "" {
 		logger.Error("Unauthorized: tokenString is empty")
@@ -25,7 +24,6 @@ func GetUserHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// Verify the token
-	logger.Info("Verifying token...")
 	token, err := utils.VerifyToken(tokenString)
 	if err != nil {
 		logger.Error("Unauthorized: ", err)
@@ -33,7 +31,6 @@ func GetUserHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// Get the claims from the token
-	logger.Info("Getting token claims...")
 	claims, err := utils.GetTokenClaims(token)
 	if err != nil {
 		logger.Error("Invalid token claims: ", err)
@@ -49,7 +46,6 @@ func GetUserHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// Retrieve the user from the database by username
-	logger.Info("Retrieving user from database...")
 	user, err := models.GetUserByUsername(username)
 	if err != nil {
 		logger.Error("Error retrieving user: ", err)
@@ -70,7 +66,6 @@ func UpdateUserHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// Extract the token from the request headers
-	logger.Info("Extracting token from request headers...")
 	tokenString := utils.ExtractTokenFromRequest(r)
 	if tokenString == "" {
 		logger.Error("Unauthorized: tokenString is empty")
@@ -78,7 +73,6 @@ func UpdateUserHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// Verify the token
-	logger.Info("Verifying token...")
 	token, err := utils.VerifyToken(tokenString)
 	if err != nil {
 		logger.Error("Unauthorized: ", err)
@@ -86,7 +80,6 @@ func UpdateUserHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// Get the claims from the token
-	logger.Info("Getting token claims...")
 	claims, err := utils.GetTokenClaims(token)
 	if err != nil {
 		logger.Error("Invalid token claims: ", err)
@@ -102,7 +95,6 @@ func UpdateUserHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// Retrieve the user from the database by username
-	logger.Info("Retrieving user from database...")
 	user, err := models.GetUserByUsername(username)
 	if err != nil {
 		logger.Error("Error retrieving user: ", err)
@@ -121,7 +113,6 @@ func UpdateUserHandler(w http.ResponseWriter, r *http.Request) {
 	// Update the user fields
 	user.Password = updatedUser.Password
 	// Update or save the user in the database
-	logger.Info("Checking user existence in the database...")
 	if user.Username != "" {
 		logger.Info("User already exists. Updating fields...")
 		err = user.Update()
@@ -130,6 +121,8 @@ func UpdateUserHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Error updating user", http.StatusInternalServerError)
 			return
 		}
+		logger.Info("User updated successfully")
+		jsonResponse(w, "User updated successfully", http.StatusOK)
 	} else {
 		logger.Info("User not found. Creating...")
 		err = user.Save()
@@ -138,8 +131,7 @@ func UpdateUserHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Error saving user", http.StatusInternalServerError)
 			return
 		}
+		logger.Info("User saved successfully")
+		jsonResponse(w, "User saved successfully", http.StatusOK)
 	}
-	// Return a success response
-	logger.Info("User updated or saved successfully")
-	jsonResponse(w, "User updated or saved successfully", http.StatusOK)
 }

@@ -1,0 +1,100 @@
+openapi: 3.0.0
+info:
+  title: Go Auth Server
+  version: 1.0.0
+paths:
+  /login:
+    post:
+      summary: User login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+      responses:
+        "200":
+          description: Successful login
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+  /signup:
+    post:
+      summary: User signup
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+      responses:
+        "200":
+          description: Successful signup
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+  /user:
+    get:
+      summary: Get user information
+      security:
+        - JWTAuth: []
+      responses:
+        "200":
+          description: Successful user retrieval
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  username:
+                    type: string
+
+  /user/update:
+    put:
+      summary: Update user password
+      security:
+        - JWTAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                password:
+                  type: string
+      responses:
+        "200":
+          description: Successful password update
+
+  /:
+    get:
+      summary: API Specification
+      responses:
+        "200":
+          description: Successful retrieval of API specification
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  specification:
+                    type: string

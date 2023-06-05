@@ -19,3 +19,10 @@
 
 # Go workspace file
 go.work
+
+# env
+.env
+
+# init scripts
+init.sql
+init.sh

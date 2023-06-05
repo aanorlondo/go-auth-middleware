@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: Go Auth Server
   version: 1.0.0
-  description: Centralized Authentication (Golang) & Authorization (JWT+Redis) LAN server
+  description: Golang Centralized Authentication (MySQL) & Authorization (JWT+Redis) LAN server
 servers:
   - url: "https://macbookpro-de-khaled.lan/go-auth"
 
@@ -17,10 +17,20 @@ components:
       scheme: bearer
       bearerFormat: API_KEY
 
+tags:
+  - name: Authentication
+    description: authentication related routes
+  - name: Authorization
+    description: RBAC related routes
+  - name: Users
+    description: user informations
+
 paths:
   # LOGIN
   /login:
     post:
+      tags:
+        - Authentication
       summary: User login
       requestBody:
         required: true
@@ -47,6 +57,8 @@ paths:
   # SIGN UP
   /signup:
     post:
+      tags:
+        - Authentication
       summary: User signup
       requestBody:
         required: true
@@ -73,6 +85,8 @@ paths:
   # GET USER
   /user:
     get:
+      tags:
+        - Users
       summary: Get user information
       security:
         - JWTAuth: []
@@ -90,6 +104,8 @@ paths:
   # UPDATE USER
   /user/update:
     put:
+      tags:
+        - Users
       summary: Update user password
       security:
         - JWTAuth: []
@@ -109,6 +125,8 @@ paths:
   # CHECK USER PRIVILEGES
   /user/check:
     get:
+      tags:
+        - Authorization
       summary: Check user privileges
       security:
         - JWTAuth: []
@@ -126,6 +144,8 @@ paths:
   # PROMOTE USER PRIVILEGES
   /user/promote:
     post:
+      tags:
+        - Authorization
       summary: Promote user privileges to 'readWrite'
       security:
         - APIKeyAuth: []
@@ -152,6 +172,8 @@ paths:
   # DEMOTE USER PRIVILEGES
   /user/demote:
     post:
+      tags:
+        - Authorization
       summary: Demote user privileges to 'readOnly'
       security:
         - APIKeyAuth: []

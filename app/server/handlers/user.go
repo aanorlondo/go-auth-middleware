@@ -110,13 +110,15 @@ func UpdateUserHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid request payload", http.StatusBadRequest)
 		return
 	}
-	// Update the user fields
-	user.Password, err = hashPassword(updatedUser.Password)
+	// Hash the new password
+	hashedPassword, err := hashPassword(updatedUser.Password)
 	if err != nil {
 		logger.Error("Error hashing new password: ", err)
-		http.Error(w, "Error hasing new password", http.StatusInternalServerError)
+		http.Error(w, "Error hashing new password", http.StatusInternalServerError)
 		return
 	}
+	// Update the user fields
+	user.Password = hashedPassword
 	// Update or save the user in the database
 	if user.Username != "" {
 		logger.Info("User already exists. Updating fields...")
@@ -128,15 +130,5 @@ func UpdateUserHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		logger.Info("User updated successfully")
 		jsonResponse(w, "User updated successfully", http.StatusOK)
-	} else {
-		logger.Info("User not found. Creating...")
-		err = user.Save()
-		if err != nil {
-			logger.Error("Error saving user: ", err)
-			http.Error(w, "Error saving user", http.StatusInternalServerError)
-			return
-		}
-		logger.Info("User saved successfully")
-		jsonResponse(w, "User saved successfully", http.StatusOK)
 	}
 }

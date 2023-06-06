@@ -88,7 +88,7 @@ func (u *User) Update() error {
 	}
 	defer db.Close()
 	logger.Info("Executing query...")
-	_, err = db.Exec("UPDATE "+databaseTableName+" SET password = ? WHERE username = ?", u.Username, u.Password)
+	_, err = db.Exec("UPDATE "+databaseTableName+" SET password = ? WHERE username = ?", u.Password, u.Username)
 	if err != nil {
 		logger.Error("ERROR when updating user: ", err)
 		return err

@@ -4,7 +4,7 @@ info:
   version: 1.0.0
   description: Golang Centralized Authentication (MySQL) & Authorization (JWT+Redis) LAN server
 servers:
-  - url: "https://MacbookPro-de-Khaled.lan/go-auth"
+  - url: "https://${HOSTNAME}/go-auth"
 
 components:
   securitySchemes:
